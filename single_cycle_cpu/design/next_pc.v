@@ -5,7 +5,8 @@ module next_pc(
 );
 
 always @(*) begin
-    next_pc = pc + 4;
+    if(pc == 32'd88) next_pc = 0;
+    else next_pc = pc + 4;
 end
 
 endmodule

@@ -16,27 +16,17 @@ wire [31: 0] out_mem;
 wire [31: 0] pc;
 wire [31: 0] next_pc;
 
-// 指令译码
-wire [6:  0] opcode;
-wire [2:  0] func3;
-wire [6:  0] func7;
-wire [5:  0] rd, rs1, rs2;
+
+wire [4:  0] rd, rs1, rs2;
 wire [11: 0] imm_12;
 
 // 控制信号
-wire [1:  0] aluc;
-wire [0:  0] aluOut_WB_memOut;
-wire [0:  0] write_mem;
-wire [0:  0] rs2Data_EX_imm32;
-wire [0:  0] write_reg;
+wire [3:  0] aluc;
+wire aluOut_WB_memOut;
+wire write_mem;
+wire rs2Data_EX_imm32;
+wire write_reg;
 
-assign opcode = instruction[6: 0];
-assign rd = instruction[11: 7];
-assign func3 = instruction[14: 12];
-assign rs1 = instruction[19: 15];
-assign rs2 = instruction[24: 20];
-assign func7 = instruction[31: 25];
-assign imm_12 = instruction[31: 20];
 
 pc PC(
     .rst(rst),
@@ -52,16 +42,19 @@ next_pc NEXT_PC(
     .next_pc(next_pc)
 );
 
-control_unit CONTROL_UNIT(
-    .opcode(opcode),
-    .func3(func3),
-    .func7(func7),
+id ID(
+    .instruction(instruction),
 
     .aluc(aluc),
     .aluOut_WB_memOut(aluOut_WB_memOut),
     .write_mem(write_mem),
     .rs2Data_EX_imm32(rs2Data_EX_imm32),
-    .write_reg(write_reg)
+    .write_reg(write_reg),
+
+    .rd(rd),
+    .rs1(rs1),
+    .rs2(rs2),
+    .imm_12(imm_12)
 );
 
 instruction_mem INSTRUCTION_MEM(

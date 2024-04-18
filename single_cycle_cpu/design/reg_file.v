@@ -9,23 +9,24 @@ module reg_file(
 
 reg [31: 0] regs[31: 0];
 
-always @(posedge rst) begin
-    regs[0] = 32'h0000_0000;
-    for(integer i = 1; i < 32;i = i + 1) begin
-        regs[i] = 32'hffff_ffff;
-    end
-end
-
 always @(posedge clk) begin
     if(write_reg) regs[target_reg] = write_rd_data;
 end
 
 always @(*) begin
-    read_rs1_data = regs[rs1];
+    if(rs1 == 5'h0)begin
+        read_rs1_data = 32'h0000_0000;
+    end else begin
+        read_rs1_data = regs[rs1];
+    end
 end
 
 always @(*) begin
-    read_rs2_data = regs[rs2];
+    if(rs2 == 5'h0)begin
+        read_rs2_data = 32'h0000_0000;
+    end else begin
+        read_rs2_data = regs[rs2];
+    end
 end
 
 endmodule
