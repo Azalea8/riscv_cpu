@@ -10,7 +10,9 @@ wire [31: 0] write_rd_data;
 wire [31: 0] read_rs1_data;
 wire [31: 0] read_rs2_data;
 wire [31: 0] imm_32;
+wire [31: 0] in_alu_a;
 wire [31: 0] in_alu_b;
+wire [31: 0] in_alu_b_temp;
 wire [31: 0] out_alu;
 wire [31: 0] out_mem;
 wire [31: 0] pc;
@@ -18,15 +20,17 @@ wire [31: 0] next_pc;
 
 
 wire [4:  0] rd, rs1, rs2;
-wire [11: 0] imm_12;
 
 // 控制信号
 wire [3:  0] aluc;
 wire aluOut_WB_memOut;
-wire write_mem;
-wire rs2Data_EX_imm32;
+wire rs1Data_EX_PC;
+wire[1: 0] rs2Data_EX_imm32_4;
 wire write_reg;
-
+wire write_mem_4B, write_mem_2B, write_mem_1B;
+wire read_mem_4B, read_mem_2B, read_mem_1B;
+wire extension_mem;
+wire[1: 0] not_NEXTPC_pcImm_rs1Imm;
 
 pc PC(
     .rst(rst),
@@ -37,24 +41,32 @@ pc PC(
 );
 
 next_pc NEXT_PC(
+    .not_NEXTPC_pcImm_rs1Imm(not_NEXTPC_pcImm_rs1Imm),
     .pc(pc),
-
+    .offset(imm_32),
+    .rs1Data(read_rs1_data),
     .next_pc(next_pc)
 );
 
 id ID(
     .instruction(instruction),
 
+    // 传出的控制信号
     .aluc(aluc),
     .aluOut_WB_memOut(aluOut_WB_memOut),
-    .write_mem(write_mem),
-    .rs2Data_EX_imm32(rs2Data_EX_imm32),
+    .rs1Data_EX_PC(rs1Data_EX_PC),
+    .rs2Data_EX_imm32_4(rs2Data_EX_imm32_4),
     .write_reg(write_reg),
+    .write_mem_1B(write_mem_1B), .write_mem_2B(write_mem_2B), .write_mem_4B(write_mem_4B),
+    .read_mem_1B(read_mem_1B), .read_mem_2B(read_mem_2B), .read_mem_4B(read_mem_4B),
+    .extension_mem(extension_mem),
+    .not_NEXTPC_pcImm_rs1Imm(not_NEXTPC_pcImm_rs1Imm),
 
+    // 译码的相关数据
     .rd(rd),
     .rs1(rs1),
     .rs2(rs2),
-    .imm_12(imm_12)
+    .imm_32(imm_32)
 );
 
 instruction_mem INSTRUCTION_MEM(
@@ -76,7 +88,7 @@ reg_file REG_FILE(
     .read_rs2_data(read_rs2_data)
 );
 
-mux MUX_WB(
+mux_2 MUX_WB(
     .signal(aluOut_WB_memOut),
     .a(out_alu),
     .b(out_mem),
@@ -84,23 +96,26 @@ mux MUX_WB(
     .out(write_rd_data)
 );
 
-mux MUX_EX(
-    .signal(rs2Data_EX_imm32),
+mux_3 MUX_EX_B(
+    .signal(rs2Data_EX_imm32_4),
     .a(read_rs2_data),
     .b(imm_32),
+    .c(32'd4),
 
     .out(in_alu_b)
 );
 
-ext EXT(
-    .imm_12(imm_12),
+mux_2 MUX_EX_A(
+    .signal(rs1Data_EX_PC),
+    .a(read_rs1_data),
+    .b(pc),
 
-    .imm_32(imm_32)
+    .out(in_alu_a)
 );
 
 alu ALU(
     .aluc(aluc),
-    .a(read_rs1_data),
+    .a(in_alu_a),
     .b(in_alu_b),
 
     .out(out_alu)
@@ -109,9 +124,11 @@ alu ALU(
 data_mem DATA_MEM(
     .clk(clk),
     .rst(rst),
-    .write_mem(write_mem),
     .address(out_alu),
     .write_data(read_rs2_data),
+    .write_mem_1B(write_mem_1B), .write_mem_2B(write_mem_2B), .write_mem_4B(write_mem_4B),
+    .read_mem_1B(read_mem_1B), .read_mem_2B(read_mem_2B), .read_mem_4B(read_mem_4B),
+    .extension_mem(extension_mem),
 
     .out_mem(out_mem)
 );

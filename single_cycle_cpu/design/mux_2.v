@@ -1,4 +1,4 @@
-module mux(
+module mux_2(
     input signal,
     input [31: 0] a, b,
 
