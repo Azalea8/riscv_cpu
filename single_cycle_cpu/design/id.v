@@ -1,13 +1,13 @@
 module id(
     input [31: 0] instruction,
 
-    output reg [3: 0] aluc,
+    output reg [4: 0] aluc,
     output reg aluOut_WB_memOut, write_reg, rs1Data_EX_PC,
     output reg [1: 0] rs2Data_EX_imm32_4,
     output reg write_mem_1B, write_mem_2B, write_mem_4B,
     output reg read_mem_1B, read_mem_2B, read_mem_4B,
     output reg extension_mem,
-    output reg [1: 0] not_NEXTPC_pcImm_rs1Imm,
+    output reg [1: 0] pcImm_NEXTPC_rs1Imm,
 
     output reg [4:  0] rd, rs1, rs2,
     output reg [31: 0] imm_32
@@ -23,6 +23,7 @@ wire [11: 0] _imm_12 = instruction[31: 20];
 wire [19: 0] _imm_20 = instruction[31: 12];
 reg [20: 0] imm_21;
 reg [11: 0] imm_12;
+reg [12: 0] imm_13;
 
 always @(*) begin
     case (opcode)
@@ -35,8 +36,8 @@ always @(*) begin
             write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
             read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
             extension_mem = 0;
-            aluc = 4'b0000;
-            not_NEXTPC_pcImm_rs1Imm = 2'b00;
+            aluc = 5'b00000;
+            pcImm_NEXTPC_rs1Imm = 2'b00;
 
             rd = _rd;
             rs1 = 5'b0;
@@ -52,8 +53,8 @@ always @(*) begin
             write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
             read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
             extension_mem = 0;
-            aluc = 4'b0000;
-            not_NEXTPC_pcImm_rs1Imm = 2'b00;
+            aluc = 5'b00000;
+            pcImm_NEXTPC_rs1Imm = 2'b00;
 
             rd = _rd;
             rs1 = 5'b0;
@@ -69,8 +70,8 @@ always @(*) begin
             write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
             read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
             extension_mem = 0;
-            aluc = 4'b0000;
-            not_NEXTPC_pcImm_rs1Imm = 2'b01;
+            aluc = 5'b00000;
+            pcImm_NEXTPC_rs1Imm = 2'b01;
 
             rd = _rd;
             rs1 = 5'b0;
@@ -87,13 +88,62 @@ always @(*) begin
             write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
             read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
             extension_mem = 0;
-            aluc = 4'b0000;
-            not_NEXTPC_pcImm_rs1Imm = 2'b10;
+            aluc = 5'b01010;
+            pcImm_NEXTPC_rs1Imm = 2'b10;
 
             rd = _rd;
             rs1 = _rs1;
             rs2 = 5'b0;
             imm_32 = {{20{_imm_12[11]}}, _imm_12};
+        end
+        // B型指令
+        7'b1100011:begin
+            write_reg = 0;
+            aluOut_WB_memOut = 0;
+            rs1Data_EX_PC = 0;
+            rs2Data_EX_imm32_4 = 2'b00;
+            write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
+            read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
+            extension_mem = 0;
+            pcImm_NEXTPC_rs1Imm = 2'b00;
+
+            rd = 5'b0;
+            rs1 = _rs1;
+            rs2 = _rs2;
+            imm_13 = {_imm_12[11], _rd[0], _imm_12[10: 5], _rd[4: 1], 1'b0};
+            imm_32 = {{19{imm_13[12]}}, imm_13};
+            case (func3)
+                // beq
+                3'b000:begin
+                    aluc = 5'b01011;
+                end
+                // bne
+                3'b001:begin
+                    aluc = 5'b01100;
+                end
+                // blt
+                3'b100: begin
+                    aluc = 5'b01101;
+                end
+                // bge
+                3'b101:begin
+                    aluc = 5'b01110;
+                end
+                // bltu
+                3'b110:begin
+                    aluc = 5'b01111;
+                end
+                // bgeu
+                3'b111:begin
+                    aluc = 5'b10000;
+                end
+                default:begin
+                    write_reg = 0;
+                    rd = 5'h0;
+                    rs1 = 5'h0;
+                    rs2 = 5'h0;
+                end
+            endcase
         end
         // L型指令
         7'b0000011:begin
@@ -104,8 +154,8 @@ always @(*) begin
             write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
             read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
             extension_mem = 0;
-            aluc = 4'b0000;
-            not_NEXTPC_pcImm_rs1Imm = 2'b00;
+            aluc = 5'b00000;
+            pcImm_NEXTPC_rs1Imm = 2'b00;
 
             rd = _rd;
             rs1 = _rs1;
@@ -153,8 +203,8 @@ always @(*) begin
             write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
             read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
             extension_mem = 0;
-            aluc = 4'b0000;
-            not_NEXTPC_pcImm_rs1Imm = 2'b00;
+            aluc = 5'b00000;
+            pcImm_NEXTPC_rs1Imm = 2'b00;
 
             rd = 5'h0;
             rs1 = _rs1;
@@ -191,7 +241,7 @@ always @(*) begin
             write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
             read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
             extension_mem = 0;
-            not_NEXTPC_pcImm_rs1Imm = 2'b00;
+            pcImm_NEXTPC_rs1Imm = 2'b00;
 
             rd = _rd;
             rs1 = _rs1;
@@ -200,31 +250,31 @@ always @(*) begin
             case (func3)
                 // addi
                 3'b000:begin
-                    aluc = 4'b0000;
+                    aluc = 5'b00000;
                 end
                 // slti
                 3'b010:begin
-                    aluc = 4'b0110;
+                    aluc = 5'b00110;
                 end
                 // sltiu
                 3'b011:begin
-                    aluc = 4'b0111;
+                    aluc = 5'b00111;
                 end
                 // xori
                 3'b100:begin
-                    aluc = 4'b0100;
+                    aluc = 5'b00100;
                 end
                 // ori
                 3'b110:begin
-                    aluc = 4'b0011;
+                    aluc = 5'b00011;
                 end
                 // andi
                 3'b111:begin
-                    aluc = 4'b0010;
+                    aluc = 5'b00010;
                 end
                 // slli
                 3'b001:begin
-                    aluc = 4'b0101;
+                    aluc = 5'b00101;
                     imm_12 = {7'b0 ,_imm_12[4: 0]};
                     imm_32 = {{20{imm_12[11]}}, imm_12};
                 end
@@ -232,8 +282,8 @@ always @(*) begin
                 3'b101:begin
                     imm_12 = {7'b0 ,_imm_12[4: 0]};
                     imm_32 = {{20{imm_12[11]}}, imm_12};
-                    if(func7[5]) aluc = 4'b1001;
-                    else aluc = 4'b1000;
+                    if(func7[5]) aluc = 5'b01001;
+                    else aluc = 5'b01000;
                 end
                 default:begin
                     write_reg = 0;
@@ -252,7 +302,7 @@ always @(*) begin
             write_mem_4B = 0; write_mem_2B = 0; write_mem_1B = 0;
             read_mem_4B = 0; read_mem_2B = 0; read_mem_1B = 0;
             extension_mem = 0;
-            not_NEXTPC_pcImm_rs1Imm = 2'b00;
+            pcImm_NEXTPC_rs1Imm = 2'b00;
 
             rd = _rd;
             rs1 = _rs1;
@@ -263,39 +313,39 @@ always @(*) begin
                 // sub, add
                 3'b000:begin
                     if(func7[5])begin
-                        aluc = 4'b0001;
+                        aluc = 5'b00001;
                     end else begin
-                        aluc = 4'b0000;
+                        aluc = 5'b00000;
                     end
                 end
                 // or
                 3'b110:begin
-                    aluc = 4'b0011;
+                    aluc = 5'b00011;
                 end
                 // and
                 3'b111:begin
-                    aluc = 4'b0010;
+                    aluc = 5'b00010;
                 end
                 // xor
                 3'b100:begin
-                    aluc = 4'b0100;
+                    aluc = 5'b00100;
                 end
                 // sll
                 3'b001:begin
-                    aluc = 4'b0101;
+                    aluc = 5'b00101;
                 end
                 // slt
                 3'b010:begin
-                    aluc = 4'b0110;
+                    aluc = 5'b00110;
                 end
                 // sltu
                 3'b011:begin
-                    aluc = 4'b0111;
+                    aluc = 5'b00111;
                 end
                 // srl, sra
                 3'b101:begin
-                    if(func7[5]) aluc = 4'b1001;
-                    else aluc = 4'b1000;
+                    if(func7[5]) aluc = 5'b01001;
+                    else aluc = 5'b01000;
                 end 
                 default: begin
                     write_reg = 0;

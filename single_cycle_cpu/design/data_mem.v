@@ -9,7 +9,7 @@ module data_mem(
     output reg [31: 0] out_mem
 );
 
-reg [7: 0] data [63: 0];
+reg [7: 0] data [1023: 0];
 
 always @(*) begin
     if(read_mem_4B)begin

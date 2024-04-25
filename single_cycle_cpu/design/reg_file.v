@@ -10,7 +10,11 @@ module reg_file(
 reg [31: 0] regs[31: 0];
 
 always @(posedge clk) begin
-    if(write_reg) regs[target_reg] = write_rd_data;
+    if(write_reg && target_reg != 5'h0) regs[target_reg] = write_rd_data;
+end
+
+initial begin
+    regs[5'd2] = 32'd1024;
 end
 
 always @(*) begin

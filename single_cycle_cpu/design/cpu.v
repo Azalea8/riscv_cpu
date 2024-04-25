@@ -5,32 +5,32 @@ module cpu(
 );
 
 // 数据
-wire [31: 0] instruction;
-wire [31: 0] write_rd_data;
-wire [31: 0] read_rs1_data;
-wire [31: 0] read_rs2_data;
-wire [31: 0] imm_32;
-wire [31: 0] in_alu_a;
-wire [31: 0] in_alu_b;
-wire [31: 0] in_alu_b_temp;
-wire [31: 0] out_alu;
-wire [31: 0] out_mem;
-wire [31: 0] pc;
-wire [31: 0] next_pc;
+wire [31: 0] instruction; // 指令
+wire [31: 0] write_rd_data; // 寄存器 rd数据
+wire [31: 0] read_rs1_data; // 寄存器 rs1的数据
+wire [31: 0] read_rs2_data; // 寄存器 rs2的数据
+wire [31: 0] imm_32; // 32位立即数
+wire [31: 0] in_alu_a; // 输入给运算器的 a口
+wire [31: 0] in_alu_b; // 输入给运算器的 b口
+wire [31: 0] out_alu; // ALU的运算结果
+wire [31: 0] out_mem; // 从内存中读的数据
+wire [31: 0] pc; // 当前指令的内存地址
+wire [31: 0] next_pc; // 下一条指令地址
 
 
-wire [4:  0] rd, rs1, rs2;
+wire [4:  0] rd, rs1, rs2; // 寄存器地址
 
 // 控制信号
-wire [3:  0] aluc;
-wire aluOut_WB_memOut;
-wire rs1Data_EX_PC;
-wire[1: 0] rs2Data_EX_imm32_4;
-wire write_reg;
-wire write_mem_4B, write_mem_2B, write_mem_1B;
-wire read_mem_4B, read_mem_2B, read_mem_1B;
-wire extension_mem;
-wire[1: 0] not_NEXTPC_pcImm_rs1Imm;
+wire [4:  0] aluc; // 控制 ALU运算
+wire aluOut_WB_memOut; // 二路选择器
+wire rs1Data_EX_PC; // 二路选择器
+wire[1: 0] rs2Data_EX_imm32_4; // 三路选择器
+wire write_reg; // 寄存器写信号
+wire write_mem_4B, write_mem_2B, write_mem_1B; // 写内存信号
+wire read_mem_4B, read_mem_2B, read_mem_1B; // 读内存信号
+wire extension_mem; // 读非4字节内存数据时，是否需要符号扩展
+wire[1: 0] pcImm_NEXTPC_rs1Imm; // 无条件跳转
+wire condition_branch; // 条件跳转
 
 pc PC(
     .rst(rst),
@@ -41,10 +41,12 @@ pc PC(
 );
 
 next_pc NEXT_PC(
-    .not_NEXTPC_pcImm_rs1Imm(not_NEXTPC_pcImm_rs1Imm),
+    .pcImm_NEXTPC_rs1Imm(pcImm_NEXTPC_rs1Imm),
+    .condition_branch(condition_branch),
     .pc(pc),
     .offset(imm_32),
     .rs1Data(read_rs1_data),
+
     .next_pc(next_pc)
 );
 
@@ -60,7 +62,7 @@ id ID(
     .write_mem_1B(write_mem_1B), .write_mem_2B(write_mem_2B), .write_mem_4B(write_mem_4B),
     .read_mem_1B(read_mem_1B), .read_mem_2B(read_mem_2B), .read_mem_4B(read_mem_4B),
     .extension_mem(extension_mem),
-    .not_NEXTPC_pcImm_rs1Imm(not_NEXTPC_pcImm_rs1Imm),
+    .pcImm_NEXTPC_rs1Imm(pcImm_NEXTPC_rs1Imm),
 
     // 译码的相关数据
     .rd(rd),
@@ -118,7 +120,8 @@ alu ALU(
     .a(in_alu_a),
     .b(in_alu_b),
 
-    .out(out_alu)
+    .out(out_alu),
+    .condition_branch(condition_branch)
 );
 
 data_mem DATA_MEM(
