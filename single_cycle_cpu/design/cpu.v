@@ -19,6 +19,9 @@ wire [31: 0] next_pc; // 下一条指令地址
 
 
 wire [4:  0] rd, rs1, rs2; // 寄存器地址
+wire [6: 0] opcode;
+wire [2: 0] func3;
+wire [6: 0] func7;
 
 // 控制信号
 wire [4:  0] aluc; // 控制 ALU运算
@@ -26,9 +29,9 @@ wire aluOut_WB_memOut; // 二路选择器
 wire rs1Data_EX_PC; // 二路选择器
 wire[1: 0] rs2Data_EX_imm32_4; // 三路选择器
 wire write_reg; // 寄存器写信号
-wire write_mem_4B, write_mem_2B, write_mem_1B; // 写内存信号
-wire read_mem_4B, read_mem_2B, read_mem_1B; // 读内存信号
-wire extension_mem; // 读非4字节内存数据时，是否需要符号扩展
+wire [1: 0] write_mem; // 写内存信号
+wire [2: 0] read_mem; // 读内存信号
+wire [2: 0] extOP; // 立即数产生信号
 wire[1: 0] pcImm_NEXTPC_rs1Imm; // 无条件跳转
 wire condition_branch; // 条件跳转
 
@@ -50,25 +53,39 @@ next_pc NEXT_PC(
     .next_pc(next_pc)
 );
 
-id ID(
-    .instruction(instruction),
+controller CONTROLLER(
+    .opcode(opcode),
+    .func3(func3),
+    .func7(func7),
 
-    // 传出的控制信号
     .aluc(aluc),
     .aluOut_WB_memOut(aluOut_WB_memOut),
     .rs1Data_EX_PC(rs1Data_EX_PC),
     .rs2Data_EX_imm32_4(rs2Data_EX_imm32_4),
     .write_reg(write_reg),
-    .write_mem_1B(write_mem_1B), .write_mem_2B(write_mem_2B), .write_mem_4B(write_mem_4B),
-    .read_mem_1B(read_mem_1B), .read_mem_2B(read_mem_2B), .read_mem_4B(read_mem_4B),
-    .extension_mem(extension_mem),
-    .pcImm_NEXTPC_rs1Imm(pcImm_NEXTPC_rs1Imm),
+    .write_mem(write_mem),
+    .read_mem(read_mem),
+    .extOP(extOP),
+    .pcImm_NEXTPC_rs1Imm(pcImm_NEXTPC_rs1Imm)
+);
+
+imm IMM(
+    .instr(instruction),
+    .extOP(extOP),
+
+    .imm_32(imm_32)
+);
+
+id ID(
+    .instr(instruction),
 
     // 译码的相关数据
+    .opcode(opcode),
+    .func3(func3),
+    .func7(func7),
     .rd(rd),
     .rs1(rs1),
-    .rs2(rs2),
-    .imm_32(imm_32)
+    .rs2(rs2)
 );
 
 instruction_mem INSTRUCTION_MEM(
@@ -129,9 +146,8 @@ data_mem DATA_MEM(
     .rst(rst),
     .address(out_alu),
     .write_data(read_rs2_data),
-    .write_mem_1B(write_mem_1B), .write_mem_2B(write_mem_2B), .write_mem_4B(write_mem_4B),
-    .read_mem_1B(read_mem_1B), .read_mem_2B(read_mem_2B), .read_mem_4B(read_mem_4B),
-    .extension_mem(extension_mem),
+    .write_mem(write_mem),
+    .read_mem(read_mem),
 
     .out_mem(out_mem)
 );

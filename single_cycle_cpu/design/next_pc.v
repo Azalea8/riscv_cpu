@@ -10,7 +10,7 @@ always @(*) begin
     if(pcImm_NEXTPC_rs1Imm == 2'b01) next_pc = pc + offset;
     else if(pcImm_NEXTPC_rs1Imm == 2'b10) next_pc = rs1Data + offset;
     else if(condition_branch) next_pc = pc + offset;
-    else if(pc == 32'd48) next_pc = 32'd48;
+    else if(pc == 32'h6c) next_pc = 32'h6c;
     else next_pc = pc + 4;
 end
 

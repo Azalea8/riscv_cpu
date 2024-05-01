@@ -12,17 +12,33 @@ initial begin
     inst_mem[0] = 32'hfe010113;
     inst_mem[1] = 32'h00812e23;
     inst_mem[2] = 32'h02010413;
-    inst_mem[3] = 32'h07f00793;
-    inst_mem[4] = 32'hfef407a3;
-    inst_mem[5] = 32'hfef44783;
-    inst_mem[6] = 32'h00178793;
-    inst_mem[7] = 32'hfef407a3;
-    inst_mem[8] = 32'h00000793;
-    inst_mem[9] = 32'h00078513;
+    inst_mem[3] = 32'hfea42623;
+    inst_mem[4] = 32'hfec42783;
+    inst_mem[5] = 32'h0007a783;
+    inst_mem[6] = 32'h00a78713;
+    inst_mem[7] = 32'hfec42783;
+    inst_mem[8] = 32'h00e7a023;
+    inst_mem[9] = 32'h00000013;
     inst_mem[10] = 32'h01c12403;
     inst_mem[11] = 32'h02010113;
+    inst_mem[12] = 32'h00008067;
 
-    inst_mem[12] = {12'h0, 5'b0, 3'b000, 5'b0, 7'b0010011}; // nop
+    inst_mem[13] = 32'hfe010113;
+    inst_mem[14] = 32'h00112e23;
+    inst_mem[15] = 32'h00812c23;
+    inst_mem[16] = 32'h02010413;
+    inst_mem[17] = 32'h00100793;
+    inst_mem[18] = 32'hfef42623;
+    inst_mem[19] = 32'hfec40793;
+    inst_mem[20] = 32'h00078513;
+    inst_mem[21] = 32'hfadff0ef;
+    inst_mem[22] = 32'h00000793;
+    inst_mem[23] = 32'h00078513;
+    inst_mem[24] = 32'h01c12083;
+    inst_mem[25] = 32'h01812403;
+    inst_mem[26] = 32'h02010113;
+
+    inst_mem[27] = {12'h0, 5'b0, 3'b000, 5'b0, 7'b0010011}; // nop
 
 
     // inst_mem[0] = {12'h1, 5'b0, 3'b000, 5'b1, 7'b0010011}; // addi
