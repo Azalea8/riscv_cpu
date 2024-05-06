@@ -3,15 +3,27 @@ module next_pc(
     input condition_branch,
     input [31: 0] pc4, pcImm, rs1Imm,
 
-    output reg [31: 0] next_pc
+    output reg [31: 0] next_pc,
+    output reg flush
 );
 
 always @(*) begin
-    if(pcImm_NEXTPC_rs1Imm == 2'b01) next_pc = pcImm;
-    else if(pcImm_NEXTPC_rs1Imm == 2'b10) next_pc = rs1Imm;
-    else if(condition_branch) next_pc = pcImm;
-    else if(pc4 == 32'h6c) next_pc = 32'h6c;
-    else next_pc = pc4;
+    if(pcImm_NEXTPC_rs1Imm == 2'b01) begin
+        next_pc = pcImm;
+        flush = 1'b1;
+    end else if(pcImm_NEXTPC_rs1Imm == 2'b10) begin 
+        next_pc = rs1Imm;
+        flush = 1'b1;
+    end else if(condition_branch) begin 
+        next_pc = pcImm;
+        flush = 1'b1;
+    end else if(pc4 == 32'd24) begin 
+        next_pc = 32'd20;
+        flush = 1'b0;
+    end else begin 
+        next_pc = pc4;
+        flush = 1'b0;
+    end
 end
 
 endmodule

@@ -1,13 +1,19 @@
 module pc(
-    input rst, clk,
+    input rst, clk, pause,
     input [31: 0] next_pc,
 
     output reg [31: 0] pc
 );
 
 always @(posedge clk) begin
-    if(rst) pc = 32'h34;
-    else pc <= next_pc;
+    if(rst) begin
+        pc = 32'h0;
+    end else if(pause) begin
+        // 空操作
+        // 阻止寄存器值改变
+    end else begin
+        pc <= next_pc;
+    end 
 end
 
 always @(posedge rst) begin

@@ -14,11 +14,19 @@ module me_wb(
 );
 
 always @(posedge clk) begin
-    wb_aluOut_WB_memOut <= me_aluOut_WB_memOut;
-    wb_writeReg <= me_writeReg;
-    wb_outMem <= me_outMem;
-    wb_outAlu <= me_outAlu;
-    wb_rd <= me_rd;
+    if(rst) begin
+        wb_aluOut_WB_memOut = 1'b0;
+        wb_writeReg = 1'b1;
+        wb_outMem = 32'd0;
+        wb_outAlu = 32'd0;
+        wb_rd = 5'd0;
+    end else begin
+        wb_aluOut_WB_memOut <= me_aluOut_WB_memOut;
+        wb_writeReg <= me_writeReg;
+        wb_outMem <= me_outMem;
+        wb_outAlu <= me_outAlu;
+        wb_rd <= me_rd;
+    end
 end
 
 endmodule
