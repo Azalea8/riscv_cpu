@@ -1,199 +1,54 @@
-## 单周期CPU<!DOCTYPE html>
-<html class="writer-html5" lang="zh-CN" >
-<head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>实验十一 RV32I单周期CPU &mdash; 南京大学 计算机科学与技术系 数字逻辑与计算机组成 课程实验  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-        <script async="async" src="https://fastly.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="实验十二 计算机系统" href="12.html" />
-    <link rel="prev" title="实验十 CPU数据通路" href="10.html" /> 
-</head>
-
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-
-          [
-            南京大学 计算机科学与技术系 数字逻辑与计算机组成 课程实验
-          ](../index.html)
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-
-*   [实验一 选择器](01.html)
-*   [实验二 译码器和编码器](02.html)
-*   [实验三 加法器与ALU](03.html)
-*   [实验四 计数器和时钟](04.html)
-*   [实验五 寄存器组及存储器](05.html)
-*   [实验六 移位寄存器及桶形移位器](06.html)
-*   [实验七 状态机及键盘输入](07.html)
-*   [实验八 VGA接口控制器实现](08.html)
-*   [实验九 字符输入界面](09.html)
-*   [实验十 CPU数据通路](10.html)
-*   [实验十一 RV32I单周期CPU](#)
-
-        *   [RISC-V指令集简介](#risc-v)
-
-                *   [RV32I指令编码](#rv32i)
-        *   [RV32I中的通用寄存器](#id2)
-        *   [RV32I中的指令类型](#id3)
-        *   [整数运算指令](#id4)
-        *   [控制转移指令](#id5)
-        *   [存储器访问指令](#id6)
-        *   [常见伪指令](#id7)
-
-        *   [RV32I电路实现](#id8)
-
-                *   [单周期电路设计](#id9)
-
-        *   [控制通路](#id10)
-
-                *   [PC生成](#pc)
-        *   [指令存储器](#id11)
-        *   [指令译码及立即数生成](#id12)
-        *   [控制信号生成](#id13)
-        *   [跳转控制](#id14)
-        *   [数据通路](#id15)
-        *   [单周期CPU的时序设计](#cpu)
-        *   [模块化设计](#id16)
-
-        *   [软件及测试部分](#id17)
-
-                *   [单元测试](#id18)
-        *   [单步功能仿真](#id19)
-        *   [系统功能仿真](#id20)
-        *   [riscv-tests测试集简介](#riscv-tests)
-        *   [测试程序移植](#id23)
-        *   [测试集TestBench](#testbench)
-        *   [上板测试](#id24)
-
-        *   [实验验收要求](#id25)
-
-                *   [在线测试](#id26)
-
-*   [实验十二 计算机系统](12.html)
-
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-
-          [南京大学 计算机科学与技术系 数字逻辑与计算机组成 课程实验](../index.html)
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-
-*   [](../index.html)
-*   实验十一 RV32I单周期CPU
-*
-
-* * *
-
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-
-  <section id="rv32icpu">
-
-# 实验十一 RV32I单周期CPU[](#rv32icpu "Permalink to this heading")
+# RV32I CPU
 
 “陛下，我们把这台计算机命名为‘秦一号’。请看，那里，中心部分，是CPU，是计算机的核心计算元件。由您最精锐的五个军团构成，对照这张图您可以看到里面的加法器、寄存器、堆栈存贮器；外围整齐的部分是内存，构建这部分时我们发现人手不够，好在这部分每个单元的动作最简单，就训练每个士兵拿多种颜色的旗帜，组合起来后，一个人就能同时完成最初二十个人的操作，这就使内存容量达到了运行‘秦1.0’操作系统的最低要求；”
 
 > <div>
 > 
-> — 《三体》, 刘慈欣
+>  《三体》, 刘慈欣
 > 
 > </div>
 
-本实验的目标是利用FPGA实现RV32I指令集中除系统控制指令之外的其余指令。利用单周期方式实现RV32I的控制通路及数据通路，并能够顺利通过功能仿真。在完成功能仿真后可以在DE10-Standard开发板上进行单步测试。通过对单周期CPU的实际设计来理解CPU内部的控制及数据通路原理，并掌握基本的系统级测试和Debug技术。
-
-<section id="risc-v">
-
-## RISC-V指令集简介[](#risc-v "Permalink to this heading")
+## RISC-V指令集简介
 
 [RISC-V](https://riscv.org/) 是由UC Berkeley推出的一套开源指令集。
 该指令集包含一系列的基础指令集和可选扩展指令集。在本实验中我们主要关注其中的32位基础指令集RV32I。
 RV32I指令集中包含了40条基础指令，涵盖了整数运算、存储器访问、控制转移和系统控制几个大类。本实验中无需实现系统控制的ECALL/EBREAK、内存同步FENCE指令及CSR访问指令，所以共需实现37条指令。
 RV32I中的程序计数器PC及32个通用寄存器均是32位长度，访存地址线宽度也是32位。RV32I的指令长度也统一为32位，在实现过程中无需支持16位的压缩指令格式。
 
-<section id="rv32i">
-
-### RV32I指令编码[](#rv32i "Permalink to this heading")
+### RV32I指令编码
 
 RV32I的指令编码非常规整，分为六种类型，其中四种类型为基础编码类型，其余两种是变种：
 
 > <div>
 > 
-> *   **R-Type** ：为寄存器操作数指令，含2个源寄存器rs1,rs2和一个目的寄存器rd。
+> *   **R-Type** ：为寄存器操作数指令，含2个源寄存器rs1 ,rs2和一个目的寄存器 rd。
 > 
-> *   **I-Type** ：为立即数操作指令，含一个源寄存器和一个目的寄存器和一个12bit立即数操作数
+> *   **I-Type** ：为立即数操作指令，含1个源寄存器和1个目的寄存器和1个12bit立即数操作数
 > 
-> *   **S-Type** ：为存储器写指令，含两个源寄存器和一个12bit立即数。
+> *   **S-Type** ：为存储器写指令，含2个源寄存器和一个12bit立即数。
 > 
-> *   B-Type：为跳转指令，实际是S-Type的变种。与S-Type主要的区别是立即数编码。S-Type中的imm[11:5]变为{immm[12], imm[10:5]}，imm[4:0]变为{imm[4:1], imm[11]}。
+> *   **B-Type** ：为跳转指令，实际是 *S-Type* 的变种。与 *S-Type* 主要的区别是立即数编码。
 > 
 > *   **U-Type** ：为长立即数指令，含一个目的寄存器和20bit立即数操作数。
 > 
-> *   J-Type：为长跳转指令，实际是U-Type的变种。与U-Type主要的区别是立即数编码。U-Type中的imm[31:12]变为{imm[20], imm[10:1], imm[11], imm[19:12]}。
+> *   **J-Type** ：为长跳转指令，实际是 *U-Type* 的变种。与 *U-Type* 主要的区别是立即数编码。
 > </div>
 
-其中四种基本格式如图 [<span class="std std-numref">Fig. 73</span>](#fig-riscvisa) 所示：
+其中四种基本格式如图
 
-<figure class="align-default" id="fig-riscvisa">
-![../_images/riscvisa.png](../_images/riscvisa.png)
-<figcaption>
-
-<span class="caption-number">Fig. 73 </span><span class="caption-text">RV32I指令的四种基本格式</span>[](#fig-riscvisa "Permalink to this image")
-
-</figcaption>
-</figure>
+![指令格式](_images/riscvisa.png)
 
 在指令编码中，opcode必定为指令低7bit，源寄存器rs1，rs2和目的寄存器rd也都在特定位置出现，所以指令解码非常方便。
 
-<div class="admonition myquestion">
-
-思考
-
-为什么会有S-Type/B-Type，U-Type/J-Type这些不同的立即数编码方案？指令相关的立即数为何在编码时采用这样“奇怪”的bit顺序？
-
-</div>
-</section>
-<section id="id2">
-
-### RV32I中的通用寄存器[](#id2 "Permalink to this heading")
+### RV32I中的通用寄存器
 
 RV32I共32个32bit的通用寄存器x0~x31(寄存器地址为5bit编码），其中寄存器x0中的内容总是0，无法改变。
-其他寄存器的别名和寄存器使用约定参见表 [<span class="std std-numref">Table 12</span>](#tab-regname) 。需要注意的是，部分寄存器在函数调用时是由调用方（Caller）来负责保存的，部分寄存器是由被调用方（Callee）来保存的。在进行C语言和汇编混合编程时需要注意。
+其他寄存器的别名和寄存器使用约定参见表。
+
+需要注意的是，部分寄存器在函数调用时是由调用方（Caller）来负责保存的，部分寄存器是由被调用方（Callee）来保存的。在进行C语言和汇编混合编程时需要注意。
 
 <table class="docutils align-default" id="tab-regname">
-<caption><span class="caption-number">Table 12 </span><span class="caption-text">RV32I中通用寄存器的定义与用法</span>[](#tab-regname "Permalink to this table")</caption>
+<caption><span class="caption-number">Table 12 </span><span class="caption-text">RV32I中通用寄存器的定义与用法</span></caption>
 <thead>
 <tr class="row-odd"><th class="head">
 
@@ -420,38 +275,27 @@ Caller
 </tr>
 </tbody>
 </table>
-</section>
-<section id="id3">
 
-### RV32I中的指令类型[](#id3 "Permalink to this heading")
+### RV32I中的指令类型
 
 本实验中需要实现的RV32I指令含包含以下三类：
 
 *   **整数运算指令** ：可以是对两个源寄存器操作数，或一个寄存器一个立即数操作数进行计算后，结果送入目的寄存器。运算操作包括带符号数和无符号数的算术运算、移位、逻辑操作和比较后置位等。
 
-*   **控制转移指令** ：条件分支包括beq，bne等等，根据寄存器内容选择是否跳转。无条件跳转指令会将本指令下一条指令地址PC+4存入rd中供函数返回时使用。
+*   **控制转移指令** ：条件分支包括 *beq* ，*bne* 等等，根据寄存器内容选择是否跳转。无条件跳转指令会将本指令下一条指令地址 *PC+4* 存入 *rd* 中供函数返回时使用。
 
-*   **存储器访问指令** ：对内存操作是首先寄存器加立即数偏移量，以计算结果为地址读取/写入内存。读写时可以是按32位字，16位半字或8位字节来进行读写。读写时区分无符号数和带符号数。注意：RV32I为 [Load/Store](https://en.wikipedia.org/wiki/Load%E2%80%93store_architecture) 型架构，内存中所有数据都需要先load进入寄存器才能进行操作，不能像x86一样直接对内存数据进行算术处理。
-</section>
-<section id="id4">
+*   **存储器访问指令** ：对内存操作是首先寄存器加立即数偏移量，以计算结果为地址读取/写入内存。读写时可以是按32位字，16位半字或8位字节来进行读写。读写时区分无符号数和带符号数。注意：RV32I为 [Load/Store](https://en.wikipedia.org/wiki/Load%E2%80%93store_architecture) 型架构，内存中所有数据都需要先 *load* 进入寄存器才能进行操作，不能像 *x86* 一样直接对内存数据进行算术处理。
 
-### 整数运算指令[](#id4 "Permalink to this heading")
+### 整数运算指令
 
-RV32I的整数运算指令包括21条不同的指令，其指令编码方式参见表 [<span class="std std-numref">Fig. 74</span>](#fig-integercode) 。
+RV32I的整数运算指令包括21条不同的指令，其指令编码方式参见表
 
-<figure class="align-default" id="fig-integercode">
-![../_images/riscv-encoding.png](../_images/riscv-encoding.png)
-<figcaption>
+![整数运算编码方式](_images/riscv-encoding.png)
 
-<span class="caption-number">Fig. 74 </span><span class="caption-text">RV32I中整数运算指令编码列表</span>[](#fig-integercode "Permalink to this image")
-
-</figcaption>
-</figure>
-
-这些整数运算指令所需要完成的操作参见表 [<span class="std std-numref">Table 13</span>](#tab-integerop) 。说明中R[reg]表示对地址为reg的寄存器进行操作，M[addr]表示对地址为addr的内存进行操作，SEXT(imm)表示对imm进行带符号扩展到32位， <span class="math notranslate nohighlight">\(\leftarrow\)</span> 表示赋值， &lt;&lt; 及 &gt;&gt; 分别表示逻辑左移和右移， &gt;&gt;&gt; 表示算术右移(注意verilog与java中定义的不同)，比较过程中带s和u下标分别表示带符号数和无符号数比较。
+这些整数运算指令所需要完成的操作参见表。
 
 <table class="docutils align-default" id="tab-integerop">
-<caption><span class="caption-number">Table 13 </span><span class="caption-text">整数运算指令操作说明</span>[](#tab-integerop "Permalink to this table")</caption>
+<caption><span class="caption-number"></span><span class="caption-text">整数运算指令操作说明</span></caption>
 <thead>
 <tr class="row-odd"><th class="head">
 
@@ -459,7 +303,7 @@ RV32I的整数运算指令包括21条不同的指令，其指令编码方式参�
 </th>
 <th class="head">
 
-操作
+行为
 </th>
 </tr>
 </thead>
@@ -470,7 +314,7 @@ lui rd,imm20
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow \{imm20, 12'b0\}\)</span>
+<span class="math notranslate nohighlight">将 20 位的立即数左移12位，低 12 位补零，并写回寄存器 rd 中</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -479,7 +323,7 @@ auipc rd,imm20
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow PC + \{imm20, 12'b0\}\)</span>
+<span class="math notranslate nohighlight">将 20 位的立即数左移12位，低 12 位补零，将得到的 32 位数与 pc 的值相加，最后写回寄存器 rd 中</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -488,7 +332,7 @@ addi rd,rs1,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] + SEXT(imm12)\)</span>
+<span class="math notranslate nohighlight">立即数加法</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -497,7 +341,7 @@ slti rd,rs1,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(if\ R[rs1] &lt;_s SEXT(imm12)\ then\ R[rd] \leftarrow 32'b1 else R[rd] \leftarrow 32'b0\)</span>
+<span class="math notranslate nohighlight">立即数有符号小于比较</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -506,7 +350,7 @@ sltiu rd,rs1,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(if\ R[rs1] &lt;_u SEXT(imm12)\ then\ R[rd] \leftarrow 32'b1 else R[rd] \leftarrow 32'b0\)</span>
+<span class="math notranslate nohighlight">立即数无符号小于比较</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -515,7 +359,7 @@ xori rd,rs1,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] \oplus SEXT(imm12)\)</span>
+<span class="math notranslate nohighlight">立即数逻辑异或</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -524,7 +368,7 @@ ori rd,rs1,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] | SEXT(imm12)\)</span>
+<span class="math notranslate nohighlight">立即数逻辑或</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -533,7 +377,7 @@ andi rd,rs1,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] \&amp; SEXT(imm12)\)</span>
+<span class="math notranslate nohighlight">立即数逻辑与</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -542,7 +386,7 @@ slli rd,rs1,shamt
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] &lt;&lt; shamt\)</span>
+<span class="math notranslate nohighlight">立即数逻辑左移</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -551,7 +395,7 @@ srli rd,rs1,shamt
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] &gt;&gt; shamt\)</span>
+<span class="math notranslate nohighlight">立即数逻辑右移</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -560,7 +404,7 @@ srai rd,rs1,shamt
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] &gt;&gt;&gt; shamt\)</span>
+<span class="math notranslate nohighlight">立即数算数右移</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -569,7 +413,7 @@ add rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] + R[rs2]\)</span>
+<span class="math notranslate nohighlight">加法</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -578,7 +422,7 @@ sub rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] - R[rs2]\)</span>
+<span class="math notranslate nohighlight">减法</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -587,7 +431,7 @@ sll rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] &lt;&lt; R[rs2][4:0]\)</span>
+<span class="math notranslate nohighlight">逻辑左移</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -596,7 +440,7 @@ slt rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(if\ R[rs1] &lt;_s R[rs2] \hspace{0.1in} then\ R[rd] \leftarrow 32'b1 else R[rd] \leftarrow 32'b0\)</span>
+<span class="math notranslate nohighlight">有符号小于比较</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -605,7 +449,7 @@ sltu rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(if\ R[rs1] &lt;_u R[rs2] \hspace{0.1in} then\ R[rd] \leftarrow 32'b1 else R[rd] \leftarrow 32'b0\)</span>
+<span class="math notranslate nohighlight">无符号小于比较</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -614,7 +458,7 @@ xor rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] \oplus R[rs2]\)</span>
+<span class="math notranslate nohighlight">逻辑异或</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -623,7 +467,7 @@ srl rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] &gt;&gt; R[rs2][4:0]\)</span>
+<span class="math notranslate nohighlight">逻辑右移</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -632,7 +476,7 @@ sra rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] &gt;&gt;&gt; R[rs2][4:0]\)</span>
+<span class="math notranslate nohighlight">算数右移</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -641,7 +485,7 @@ or rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] | R[rs2]\)</span>
+<span class="math notranslate nohighlight">逻辑或</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -650,31 +494,23 @@ and rd,rs1,rs2
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(R[rd] \leftarrow R[rs1] \&amp; R[rs2]\)</span>
+<span class="math notranslate nohighlight">逻辑与</span>
 </td>
 </tr>
 </tbody>
 </table>
 
-细心的同学可能会注意到基本的整数运算指令并没有完全覆盖到所有的运算操作。RV32I中基本指令集可以通过伪指令或组合指令的方式来实现基本指令中未覆盖到的功能，具体可以参考 [<span class="std std-ref">常见伪指令</span>](#id7) 节。对于乘除法这样的功能是通过软件实现的，在下一实验中会介绍。
+基本的整数运算指令并没有完全覆盖到所有的运算操作。RV32I中基本指令集可以通过伪指令或组合指令的方式来实现基本指令中未覆盖到的功能，具体可以参考 常见伪指令 节。
 
-</section>
-<section id="id5">
 
-### 控制转移指令[](#id5 "Permalink to this heading")
+### 控制转移指令
 
-RV32I中包含了6条分支指令和2条无条件转移指令。图 [<span class="std std-numref">Fig. 75</span>](#fig-branchcode) 列出了这些控制转移指令的编码方式。
+RV32I中包含了6条分支指令和2条无条件转移指令。图列出了这些控制转移指令的编码方式。
 
-<figure class="align-default" id="fig-branchcode">
-![../_images/branchcode.png](../_images/branchcode.png)
-<figcaption>
+![控制转移指令编码方式](/_images/branchcode.png)
 
-<span class="caption-number">Fig. 75 </span><span class="caption-text">RV32I 中控制转移指令编码列表</span>[](#fig-branchcode "Permalink to this image")
-
-</figcaption>
-</figure>
 <table class="docutils align-default" id="tab-branchop">
-<caption><span class="caption-number">Table 14 </span><span class="caption-text">控制转移指令操作说明</span>[](#tab-branchop "Permalink to this table")</caption>
+<caption><span class="caption-number"></span><span class="caption-text">控制转移指令操作说明</span></caption>
 <thead>
 <tr class="row-odd"><th class="head">
 
@@ -682,7 +518,7 @@ RV32I中包含了6条分支指令和2条无条件转移指令。图 [<span class
 </th>
 <th class="head">
 
-操作
+行为
 </th>
 </tr>
 </thead>
@@ -693,7 +529,7 @@ jal rd,imm20
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(makecell[l]{R[rd] \leftarrow PC + 4\\ PC \leftarrow (PC + SEXT(\{imm20,1'b0\}))}\)</span>
+<span class="math notranslate nohighlight">将 PC+4 的值保存到 rd 寄存器中，然后设置 PC = PC + offset</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -702,7 +538,7 @@ jalr rd,rs1,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(\makecell[l]{R[rd] \leftarrow PC + 4\\ PC \leftarrow (R[rs1] + SEXT(imm12)) \&amp; 0xfffffffe}\)</span>
+<span class="math notranslate nohighlight">将 PC+4 保存到 rd 寄存器中，然后设置 PC = rs1  + imm</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -711,7 +547,7 @@ beq rs1,rs2,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(\emph{if} R[rs1]==R[rs2] \emph{then} PC \leftarrow PC + SEXT(\{imm12,1'b0\})) \emph{else} PC \leftarrow PC + 4\)</span>
+<span class="math notranslate nohighlight">相等跳转</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -720,7 +556,7 @@ bne rs1,rs2,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(\emph{if} R[rs1]!=R[rs2] \emph{then} PC \leftarrow PC + SEXT(\{imm12,1'b0\})) \emph{else} PC \leftarrow PC + 4\)</span>
+<span class="math notranslate nohighlight">不等跳转</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -729,7 +565,7 @@ blt rs1,rs2,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(\emph{if} R[rs1] &lt;_s R[rs2] \emph{then} PC \leftarrow PC + SEXT(\{imm12,1'b0\})) \emph{else} PC \leftarrow PC + 4\)</span>
+<span class="math notranslate nohighlight">小于跳转</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -738,7 +574,7 @@ bge rs1,rs2,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(\emph{if} R[rs1] \ge_s R[rs2] \emph{then} PC \leftarrow PC + SEXT(\{imm12,1'b0\})) \emph{else} PC \leftarrow PC + 4\)</span>
+<span class="math notranslate nohighlight">大于等于跳转</span>
 </td>
 </tr>
 <tr class="row-even"><td>
@@ -747,7 +583,7 @@ bltu rs1,rs2,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(\emph{if} R[rs1] &lt;_u R[rs2] \emph{then} PC \leftarrow PC + SEXT(\{imm12,1'b0\})) \emph{else} PC \leftarrow PC + 4\)</span>
+<span class="math notranslate nohighlight">无符号小于跳转</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
@@ -756,30 +592,20 @@ bgeu rs1,rs2,imm12
 </td>
 <td>
 
-<span class="math notranslate nohighlight">\(\emph{if} R[rs1] \ge_u R[rs2] \emph{then} PC \leftarrow PC + SEXT(\{imm12,1'b0\})) \emph{else} PC \leftarrow PC + 4\)</span>
+<span class="math notranslate nohighlight">无符号大于等于跳转</span>
 </td>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="id6">
 
-### 存储器访问指令[](#id6 "Permalink to this heading")
+### 存储器访问指令
 
 RV32I提供了按字节、半字和字访问存储器的8条指令。所有访存指令的寻址方式都是寄存器间接寻址方式，访存地址可以不对齐4字节边界，但是在实现中可以要求访存过程中对齐4字节边界。在读取单个字节或半字时，可以按要求对内存数据进行符号扩展或无符号扩展后再存入寄存器。
-表 [<span class="std std-numref">Fig. 76</span>](#fig-memcode) 列出了存储访问类指令的编码方式。
-表 [<span class="std std-numref">Table 15</span>](#tab-memop) 列出了存储访问类指令的具体操作。
 
-<figure class="align-default" id="fig-memcode">
-![../_images/memcode.png](../_images/memcode.png)
-<figcaption>
+![编码方式](_images/memcode.png)
 
-<span class="caption-number">Fig. 76 </span><span class="caption-text">RV32I 中存储访问指令编码列表</span>[](#fig-memcode "Permalink to this image")
-
-</figcaption>
-</figure>
 <table class="docutils align-default" id="tab-memop">
-<caption><span class="caption-number">Table 15 </span><span class="caption-text">存储访问指令操作说明</span>[](#tab-memop "Permalink to this table")</caption>
+<caption><span class="caption-number"></span><span class="caption-text">存储访问指令操作说明</span></caption>
 <thead>
 <tr class="row-odd"><th class="head">
 
@@ -787,7 +613,7 @@ RV32I提供了按字节、半字和字访问存储器的8条指令。所有访�
 </th>
 <th class="head">
 
-操作
+行为
 </th>
 </tr>
 </thead>
@@ -796,112 +622,64 @@ RV32I提供了按字节、半字和字访问存储器的8条指令。所有访�
 
 lb rd,imm12(rs1)
 </td>
-<td><dl class="field-list simple">
-<dt class="field-odd">math<span class="colon">:</span></dt>
-<dd class="field-odd">
-
-<cite>R[rd] leftarrow SEXT(M_{1B}[ R[rs1] + SEXT(imm12) ])</cite>
-
-</dd>
-</dl>
+<td>
+<span class="math notranslate nohighlight">字节加载</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
 
 lh rd,imm12(rs1)
 </td>
-<td><dl class="field-list simple">
-<dt class="field-odd">math<span class="colon">:</span></dt>
-<dd class="field-odd">
-
-<cite>R[rd] leftarrow SEXT(M_{2B}[ R[rs1] + SEXT(imm12) ])</cite>
-
-</dd>
-</dl>
+<td>
+<span class="math notranslate nohighlight">半字加载</span>
 </td>
 </tr>
 <tr class="row-even"><td>
 
 lw rd,imm12(rs1)
 </td>
-<td><dl class="field-list simple">
-<dt class="field-odd">math<span class="colon">:</span></dt>
-<dd class="field-odd">
-
-<cite>R[rd] leftarrow M_{4B}[ R[rs1] + SEXT(imm12) ]</cite>
-
-</dd>
-</dl>
+<td>
+<span class="math notranslate nohighlight">字加载</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
 
 lbu rd,imm12(rs1)
 </td>
-<td><dl class="field-list simple">
-<dt class="field-odd">math<span class="colon">:</span></dt>
-<dd class="field-odd">
-
-<cite>R[rd] leftarrow {24’b0, M_{1B}[ R[rs1] + SEXT(imm12) ]}</cite>
-
-</dd>
-</dl>
+<td>
+<span class="math notranslate nohighlight">无符号字节加载</span>
 </td>
 </tr>
 <tr class="row-even"><td>
 
 lhu rd,imm12(rs1)
 </td>
-<td><dl class="field-list simple">
-<dt class="field-odd">math<span class="colon">:</span></dt>
-<dd class="field-odd">
-
-<cite>R[rd] leftarrow {16’b0, M_{2B}[ R[rs1] + SEXT(imm12) ] }</cite>
-
-</dd>
-</dl>
+<td>
+<span class="math notranslate nohighlight">无符号半字加载</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
 
 sb rs2,imm12(rs1)
 </td>
-<td><dl class="field-list simple">
-<dt class="field-odd">math<span class="colon">:</span></dt>
-<dd class="field-odd">
-
-<cite>M_{1B}[ R[rs1] + SEXT(imm12) ] leftarrow R[rs2][7:0]</cite>
-
-</dd>
-</dl>
+<td>
+<span class="math notranslate nohighlight">字节储存</span>
 </td>
 </tr>
 <tr class="row-even"><td>
 
 sh rs2,imm12(rs1)
 </td>
-<td><dl class="field-list simple">
-<dt class="field-odd">math<span class="colon">:</span></dt>
-<dd class="field-odd">
-
-<cite>M_{2B}[ R[rs1] + SEXT(imm12) ] leftarrow R[rs2][15:0]</cite>
-
-</dd>
-</dl>
+<td>
+<span class="math notranslate nohighlight">半字储存</span>
 </td>
 </tr>
 <tr class="row-odd"><td>
 
 sw rs2,imm12(rs1)
 </td>
-<td><dl class="field-list simple">
-<dt class="field-odd">math<span class="colon">:</span></dt>
-<dd class="field-odd">
-
-<cite>M_{4B}[ R[rs1] + SEXT(imm12) ] leftarrow R[rs2]</cite>
-
-</dd>
-</dl>
+<td>
+<span class="math notranslate nohighlight">字储存</span>
 </td>
 </tr>
 </tbody>
@@ -909,12 +687,12 @@ sw rs2,imm12(rs1)
 </section>
 <section id="id7">
 
-### 常见伪指令[](#id7 "Permalink to this heading")
+### 常见伪指令
 
-RISC-V中规定了一些常用的伪指令。这些伪指令一般可以在汇编程序中使用，汇编器会将其转换成对应的指令序列。表 [<span class="std std-numref">Table 16</span>](#tab-pseudocode) 介绍了RISC-V的常见伪指令列表。
+RISC-V中规定了一些常用的伪指令。这些伪指令一般可以在汇编程序中使用，汇编器会将其转换成对应的指令序列。表介绍了RISC-V的常见伪指令列表。
 
 <table class="docutils align-default" id="tab-pseudocode">
-<caption><span class="caption-number">Table 16 </span><span class="caption-text">常见伪指令说明</span>[](#tab-pseudocode "Permalink to this table")</caption>
+<caption><span class="caption-number"></span><span class="caption-text">常见伪指令说明</span></caption>
 <thead>
 <tr class="row-odd"><th class="head">
 
@@ -1321,79 +1099,99 @@ s{b|h|w} rd, symbol, rt
 </section>
 <section id="id8">
 
-## RV32I电路实现[](#id8 "Permalink to this heading")
+# RV32I 电路实现
 
-<section id="id9">
-
-### 单周期电路设计[](#id9 "Permalink to this heading")
+## 单周期电路设计
 
 在了解了RV32I指令集的指令体系结构（Instruction Set Architecture，ISA)之后，我们将着手设计CPU的微架构（micro architecture）。
+
 同样的一套指令体系结构可以用完全不同的微架构来实现。不同的微架构在实现的时候只要保证程序员可见的状态，即PC、通用寄存器和内存等，在指令执行过程中遵守ISA中的规定即可。具体微架构的实现可以自由发挥。
+
 在本实验中，我们首先来实现单周期CPU的微架构。所谓单周期CPU是指CPU在每一个时钟周期中需要完成一条指令的所有操作，即每个时钟周期完成一条指令。
 
 每条指令的执行过程一般需要以下几个步骤：
 
 > <div>
 > 
-> 1.  **取指令** ：使用本周期新的PC从指令存储器中取出指令，并将其放入指令寄存器（IR）中
+> 1.  **取指** ：使用本周期新的PC从指令存储器中取出指令，并将其放入指令寄存器（IR）中
 > 
-> 2.  **指令译码** ：对取出的指令进行分析，生成本周期执行指令所需的控制信号，并计算下一条指令的地址
+> 2.  **译码** ：对取出的指令进行分析，生成本周期执行指令所需的控制信号，并计算下一条指令的地址，从寄存器堆中读取寄存器操作数，并完成立即数的生成
 > 
-> 3.  **读取操作数** ：从寄存器堆中读取寄存器操作数，并完成立即数的生成
 > 
-> 4.  **运算** ：利用ALU对操作数进行必要的运算
+> 3.  **运算** ：利用ALU对操作数进行必要的运算
 > 
-> 5.  **访问内存** ：包括读取或写入内存对应地址的内容
+> 4.  **访存** ：包括读取或写入内存对应地址的内容
 > 
-> 6.  **寄存器写回** ：将最终结果写回到目的寄存器中
+> 5.  **写回** ：将最终结果写回到目的寄存器中
 > </div>
 
 每条指令执行过程中的以上几个步骤需要CPU的控制通路和数据通路配合来完成。
+
 其中控制通路主要负责控制信号的生成，通过控制信号来指示数据通路完成具体的数据操作。
 数据通路是具体完成数据存取、运算的部件。
+
 控制通路和数据通路分离的开发模式在数字系统中经常可以碰到。其设计的基本指导原则是：控制通路要足够灵活，并能够方便地修改和添加功能，控制通路的性能和时延往往不是优化重点。
+
 反过来，数据通路需要简单且性能强大。数据通路需要以可靠的方案，快速地移动和操作大量数据。
 在一个简单且性能强大的数据通路支持下，控制通路可以灵活地通过控制信号的组合来实现各种不同的应用。
 
-图 [<span class="std std-numref">Fig. 77</span>](#fig-rv32isingle) 提供了RV32I单周期CPU的参考设计，下面我们就针对该CPU的控制通路和数据通路来分别进行说明。
+图提供了RV32I单周期CPU的参考设计，下面我们就针对该CPU的控制通路和数据通路来分别进行说明。
 
-<figure class="align-default" id="fig-rv32isingle">
-![../_images/rv32isingle.png](../_images/rv32isingle.png)
-<figcaption>
 
-<span class="caption-number">Fig. 77 </span><span class="caption-text">单周期CPU的电路图</span>[](#fig-rv32isingle "Permalink to this image")
+![单周期设计图](/_images/rv32isingle.png)
 
-</figcaption>
-</figure>
-</section>
-</section>
-<section id="id10">
+### 控制通路
 
-## 控制通路[](#id10 "Permalink to this heading")
+#### PC生成
 
-<section id="pc">
+程序计数器 *PC* 控制了整个 *CPU* 指令执行的顺序。在顺序执行的条件下，下一周期的 *PC* 为本周期 *PC+4* 。如果发生跳转，PC将会变成跳转目标地址。
 
-### PC生成[](#pc "Permalink to this heading")
+本设计中每个时钟周期是以时钟信号 *CLK* 的上升沿为起点的。在上一周期结束前，利用组合逻辑电路生成本周期将要执行的指令的地址 *NextPC* 。
 
-程序计数器PC控制了整个CPU指令执行的顺序。在顺序执行的条件下，下一周期的PC为本周期PC+4。如果发生跳转，PC将会变成跳转目标地址。
-本设计中每个时钟周期是以时钟信号CLK的下降沿为起点的。在上一周期结束前，利用组合逻辑电路生成本周期将要执行的指令的地址NextPC。
-在时钟下降沿到达时，将NEXT PC同时加载到PC寄存器和指令存储器的地址缓冲中去，完成本周期指令执行的第一步。
-NextPC的计算涉及到指令译码和跳转分析，后续在 [<span class="std std-ref">跳转控制</span>](#id14) 节中会详细描述。
-在系统reset或刚刚上电时，可以将PC设置为固定的地址，如全零，让系统从特定的启动代码开始执行。
+在时钟上升沿到达时，将 *NEXT PC* 同时加载到 *PC* 寄存器和指令存储器的地址缓冲中去，完成本周期指令执行的第一步。
 
-</section>
-<section id="id11">
+*NextPC* 的计算涉及到指令译码和跳转分析，后续在 **跳转控制** 节中会详细描述。
 
-### 指令存储器[](#id11 "Permalink to this heading")
+在系统 *reset* 或刚刚上电时，可以将 *PC* 设置为固定的地址，如全零，让系统从特定的启动代码开始执行。
 
-指令寄存器Instruction Memory专门用来存放指令。虽然在冯诺伊曼结构中指令和数据是存放在统一的存储器中，但大多数现代CPU是将指令缓存和数据缓存分开的。在本实验中我们也将指令和数据分开存储。
-本实验中的指令存储器类似CPU中的指令缓存，采用FPGA中的SRAM来实现。由于DE10-Standard开发板上的大容量SRAM只支持在沿上进行读写，所以本设计采用时钟下降沿来对指令存储器进行读取操作，指令存储器的读取地址是NextPC。
-指令存储器只需要支持读操作，在本实验中，可以要求所有代码都是4字节对齐，即PC低两位可以认为总是2’b00。由于指令存储器每次总是读取4个字节，所以可以将存储器的每个单元大小设置为32bit。
-指令存储器可以使用单端口RAM来实现，总容量一般可以设置为256KB（64K条指令），可以满足大部分演示代码的需求。
-指令存储器可以用mif文件来进行初始化，mif文件可以用实验指导提供的工具链生成。如果指令存储器生成是选择了In System Memory动态SRAM内容更新的功能，可以不用编译整个工程，直接在Quartus中加载新的代码。
+### 指令存储器
+
+指令寄存器 *Instruction Memory* 专门用来存放指令。虽然在冯诺伊曼结构中指令和数据是存放在统一的存储器中，但大多数现代CPU是将指令缓存和数据缓存分开的。在本实验中我们也将指令和数据分开存储。
+
+本实验中的指令存储器类似 *CPU* 中的指令缓存。本设计采用时钟上升沿来对指令存储器进行读取操作，指令存储器的读取地址是 *PC*。
+
+指令存储器只需要支持读操作，在本实验中，可以要求所有代码都是 *4* 字节对齐，即 *PC* 低两位可以认为总是2’b00。由于指令存储器每次总是读取 *4* 个字节，所以可以将存储器的每个单元大小设置为 *32bit*。
+
+
+#### 指令译码及立即数生成
+
+在读取出本周期的指令 *instr[31:0]* 之后，*CPU* 将对 *32bit* 的指令进行译码，并产生各个指令对应的立即数。
+
+RV32I的指令比较规整，所以可以直接取指令对应的bit做为译码结果：
+
+<div class="highlight-Verilog notranslate"><div class="highlight"><pre><span></span><span class="k">assign</span><span class="w">  </span><span class="n">op</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">6</span><span class="o">:</span><span class="mh">0</span><span class="p">];</span>
+<span class="k">assign</span><span class="w">  </span><span class="n">rs1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">19</span><span class="o">:</span><span class="mh">15</span><span class="p">];</span>
+<span class="k">assign</span><span class="w">  </span><span class="n">rs2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">24</span><span class="o">:</span><span class="mh">20</span><span class="p">];</span>
+<span class="k">assign</span><span class="w">  </span><span class="n">rd</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">11</span><span class="o">:</span><span class="mh">7</span><span class="p">];</span>
+<span class="k">assign</span><span class="w">  </span><span class="n">func3</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">14</span><span class="o">:</span><span class="mh">12</span><span class="p">];</span>
+<span class="k">assign</span><span class="w">  </span><span class="n">func7</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">25</span><span class="p">];</span>
+</pre></div>
+</div>
+
+同样的，也可以利用立即数生成器 *imm Generator* 生成所有的立即数。注意，所有立即数均是符号扩展，且符号位总是 *instr[31]* :
+
+<div class="highlight-Verilog notranslate"><div class="highlight"><pre><span></span><span class="k">assign</span><span class="w"> </span><span class="n">immI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mh">20</span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="p">]}},</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">20</span><span class="p">]};</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">immU</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">12</span><span class="p">],</span><span class="w"> </span><span class="mh">12</span><span class="mb">&#39;b0</span><span class="p">};</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">immS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mh">20</span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="p">]}},</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">25</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">11</span><span class="o">:</span><span class="mh">7</span><span class="p">]};</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">immB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mh">20</span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="p">]}},</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">7</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">30</span><span class="o">:</span><span class="mh">25</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">11</span><span class="o">:</span><span class="mh">8</span><span class="p">],</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">};</span>
+<span class="k">assign</span><span class="w"> </span><span class="n">immJ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mh">12</span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="p">]}},</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">19</span><span class="o">:</span><span class="mh">12</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">20</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">30</span><span class="o">:</span><span class="mh">21</span><span class="p">],</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">};</span>
+</pre></div>
+</div>
+
+在生成各类指令的立即数之后，根据控制信号 *ExtOP* ，通过多路选择器来选择立即数生成器最终输出的 *imm* 是以上五种类型中的哪一个。
 
 <table class="docutils align-default" id="tab-extop">
-<caption><span class="caption-number">Table 17 </span><span class="caption-text">控制信号ExtOP的含义</span>[](#tab-extop "Permalink to this table")</caption>
+<caption><span class="caption-number"></span><span class="caption-text">控制信号ExtOP的含义</span></caption>
 <thead>
 <tr class="row-odd"><th class="head">
 
@@ -1453,62 +1251,25 @@ immJ
 </tr>
 </tbody>
 </table>
-</section>
-<section id="id12">
 
-### 指令译码及立即数生成[](#id12 "Permalink to this heading")
-
-在读取出本周期的指令instr[31:0]之后，CPU将对32bit的指令进行译码，并产生各个指令对应的立即数。
-RV32I的指令比较规整，所以可以直接取指令对应的bit做为译码结果：
-
-<div class="highlight-Verilog notranslate"><div class="highlight"><pre><span></span><span class="k">assign</span><span class="w">  </span><span class="n">op</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">6</span><span class="o">:</span><span class="mh">0</span><span class="p">];</span>
-<span class="k">assign</span><span class="w">  </span><span class="n">rs1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">19</span><span class="o">:</span><span class="mh">15</span><span class="p">];</span>
-<span class="k">assign</span><span class="w">  </span><span class="n">rs2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">24</span><span class="o">:</span><span class="mh">20</span><span class="p">];</span>
-<span class="k">assign</span><span class="w">  </span><span class="n">rd</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">11</span><span class="o">:</span><span class="mh">7</span><span class="p">];</span>
-<span class="k">assign</span><span class="w">  </span><span class="n">func3</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">14</span><span class="o">:</span><span class="mh">12</span><span class="p">];</span>
-<span class="k">assign</span><span class="w">  </span><span class="n">func7</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">25</span><span class="p">];</span>
-</pre></div>
-</div>
-
-同样的，也可以利用立即数生成器imm Generator生成所有的立即数。注意，所有立即数均是符号扩展，且符号位总是instr[31]:
-
-<div class="highlight-Verilog notranslate"><div class="highlight"><pre><span></span><span class="k">assign</span><span class="w"> </span><span class="n">immI</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mh">20</span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="p">]}},</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">20</span><span class="p">]};</span>
-<span class="k">assign</span><span class="w"> </span><span class="n">immU</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">12</span><span class="p">],</span><span class="w"> </span><span class="mh">12</span><span class="mb">&#39;b0</span><span class="p">};</span>
-<span class="k">assign</span><span class="w"> </span><span class="n">immS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mh">20</span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="p">]}},</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">25</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">11</span><span class="o">:</span><span class="mh">7</span><span class="p">]};</span>
-<span class="k">assign</span><span class="w"> </span><span class="n">immB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mh">20</span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="p">]}},</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">7</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">30</span><span class="o">:</span><span class="mh">25</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">11</span><span class="o">:</span><span class="mh">8</span><span class="p">],</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">};</span>
-<span class="k">assign</span><span class="w"> </span><span class="n">immJ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mh">12</span><span class="p">{</span><span class="n">instr</span><span class="p">[</span><span class="mh">31</span><span class="p">]}},</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">19</span><span class="o">:</span><span class="mh">12</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">20</span><span class="p">],</span><span class="w"> </span><span class="n">instr</span><span class="p">[</span><span class="mh">30</span><span class="o">:</span><span class="mh">21</span><span class="p">],</span><span class="w"> </span><span class="mh">1</span><span class="mb">&#39;b0</span><span class="p">};</span>
-</pre></div>
-</div>
-
-在生成各类指令的立即数之后，根据控制信号ExtOP，通过多路选择器来选择立即数生成器最终输出的imm是以上五种类型中的哪一个。
-控制信号ExtOP为3bit，可以按表 [<span class="std std-numref">Table 17</span>](#tab-extop) 方式编码，未列出的编码可视为无关。
-
-<figure class="align-default" id="fig-controlpart1">
 ![../_images/controlpart1.png](../_images/controlpart1.png)
-<figcaption>
 
-<span class="caption-number">Fig. 78 </span><span class="caption-text">RV32I指令控制信号列表第一部分</span>[](#fig-controlpart1 "Permalink to this image")
 
-</figcaption>
-</figure>
-<figure class="align-default" id="fig-controlpart2">
+<span class="caption-number">Fig. 78 </span><span class="caption-text">RV32I指令控制信号列表第一部分</span>
+
 ![../_images/controlpart2.png](../_images/controlpart2.png)
-<figcaption>
 
-<span class="caption-number">Fig. 79 </span><span class="caption-text">RV32I指令控制信号列表第二部分</span>[](#fig-controlpart2 "Permalink to this image")
+<span class="caption-number">Fig. 79 </span><span class="caption-text">RV32I指令控制信号列表第二部分</span>
 
-</figcaption>
-</figure>
-</section>
-<section id="id13">
 
-### 控制信号生成[](#id13 "Permalink to this heading")
 
-在确定指令类型后，需要生成每个指令对应的控制信号，来控制数据通路部件进行对应的动作。控制信号生产部件(Control Signal Generator)是根据instr中的操作码opcode，及func3和func7来生成对应的控制信号的。
-其中操作码实际只有高5位有用，func7实际只有次高位有用。
+#### 控制信号生成
+
+在确定指令类型后，需要生成每个指令对应的控制信号，来控制数据通路部件进行对应的动作。控制信号生产部件 *Control Signal Generator* 是根据 *instr* 中的操作码 *opcode* ，及 *func3* 和 *func7* 来生成对应的控制信号的。
+
 生成的控制信号具体包括：
 
-*   **ExtOP** :宽度为3bit，选择立即数产生器的输出类型，具体含义参见表 [<span class="std std-numref">Table 17</span>](#tab-extop) 。
+*   **ExtOP** :宽度为3bit，选择立即数产生器的输出类型。
 
 *   **RegWr** ：宽度为1bit，控制是否对寄存器rd进行写回，为1时写回寄存器。
 
