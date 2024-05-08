@@ -1,4 +1,4 @@
-module FORWARD_UNIT(
+module forward_unit(
     input me_writeReg, wb_writeReg,
     input [4: 0] me_rd, wb_rd,
     input [4: 0] ex_rs1, ex_rs2,

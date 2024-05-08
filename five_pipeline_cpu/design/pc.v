@@ -7,7 +7,7 @@ module pc(
 
 always @(posedge clk) begin
     if(rst) begin
-        pc = 32'h0;
+        pc = 32'd52;
     end else if(pause) begin
         // 空操作
         // 阻止寄存器值改变

@@ -17,7 +17,7 @@ initial begin
     for (integer i = 0; i < 32; i = i + 1) begin
         regs[i] = 32'd0;
     end
-    // regs[5'd2] = 32'd128; // 栈指针
+    regs[5'd2] = 32'd128; // 栈指针初始化
     
 end
 

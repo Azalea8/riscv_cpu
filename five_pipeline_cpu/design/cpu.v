@@ -310,7 +310,7 @@ ex_me EX_ME(
     .ex_pcImm(ex_pcImm),
     .ex_rs1Imm(ex_rs1Imm),
     .ex_outAlu(ex_outAlu),
-    .ex_rs2Data(ex_rs2Data),
+    .ex_rs2Data(ex_true_rs2Data),
     .ex_rd(ex_rd),
     .ex_rs2(ex_rs2),
 
