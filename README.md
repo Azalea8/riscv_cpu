@@ -1789,6 +1789,7 @@ RISC-V CPU是一个较为复杂的数字系统，在开发过程中需要对每�
 （看得我是头昏脑涨...）
 
 # 参考资料
+[Version 1.0 of the Chinese translation of The RISC-V Reader](http://www.riscvbook.com/chinese/)
 
 [南京大学 数字逻辑与计算机组成课程实验](https://nju-projectn.github.io/dlco-lecture-note/exp/11.html)
 
