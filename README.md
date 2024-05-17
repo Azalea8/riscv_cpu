@@ -14,6 +14,10 @@
 
 无穷无尽的指令在 *CPU* 中流过，改变寄存器和内存的值， *CPU* 就是这样简单。
 
+所以我们可以用 *C* 语言来模拟状态机，更好地便于我们调试。
+
+[300行的简单riscv模拟器](https://github.com/Azalea8/riscv_sim)
+
 # RISC-V指令集简介
 
 [RISC-V](https://riscv.org/) 是由 *UC Berkeley* 推出的一套开源指令集。
