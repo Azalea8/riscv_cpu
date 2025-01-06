@@ -10,8 +10,4 @@ always @(posedge clk) begin
     else pc <= next_pc;
 end
 
-always @(posedge rst) begin
-    pc = 0;
-end
-
 endmodule

@@ -16,8 +16,4 @@ always @(posedge clk) begin
     end 
 end
 
-always @(posedge rst) begin
-    pc = 0;
-end
-
 endmodule
