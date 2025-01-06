@@ -1800,6 +1800,44 @@ RISC-V CPU是一个较为复杂的数字系统，在开发过程中需要对每�
     90:   02010113                addi    sp,sp,32
     94:   00008067                ret
 
+生成机器码后，还需要复制到指令数组里，是个比较麻烦的过程
+
+当然也可以用脚本配合正则表达式即可
+
+    # five_pipeline_cpu/sim/script.py
+
+    import re
+
+    def generate_verilog(mem_file, asm_file):
+        with open(asm_file, 'r') as asm_f, open(mem_file, 'w') as mem_f:
+            lines = asm_f.readlines()
+            
+            index = 0
+            
+            for line in lines:
+                line = line.strip()
+                if not line or line.startswith('file format'):
+                    continue 
+
+                match = re.match(r'^([0-9a-fA-F]+):\s+([0-9a-fA-F]{8})\s+(.+)$', line)
+                if match:
+                    instruction = match.group(2)  # 机器码部分
+                    comment = match.group(3) if match.group(3) else ''  # 指令部分
+                    
+                    # 写入
+                    mem_f.write(f"inst_mem[{index}] = 32'h{instruction};        // {comment}\n")
+                    index += 1
+                else:
+                    # 如果不符合指令格式，打印调试信息
+                    print(f"Invalid instruction format || {line}")
+
+    # 文件名
+    asm_file = 'main.s'
+    mem_file = 'instruction.text'
+
+    # 脚本写入，避免多次复制
+    generate_verilog(mem_file, asm_file)
+
 ### 波形图
 
 有关波形图的部分略过，因为只需要对着波形图查看数据以及控制信号是否正确，是一个比较低级但又麻烦的步骤。
