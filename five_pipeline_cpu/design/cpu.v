@@ -100,6 +100,7 @@ pc PC(
     .rst(rst),
     .clk(clk),
     .pause(pause),
+    .flush(flush),
     .next_pc(if_nextPc),
 
     .pc(if_pc)
