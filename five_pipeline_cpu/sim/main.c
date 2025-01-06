@@ -1,5 +1,9 @@
-void fun(int *x) {
-    *x += 10;
+void fun(int* x) {
+    if(*x == 2) {
+        *x += 1;
+    }else {
+        *x += 10;
+    }
     return;
 }
 

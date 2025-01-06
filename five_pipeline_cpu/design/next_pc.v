@@ -17,8 +17,8 @@ always @(*) begin
     end else if(condition_branch) begin 
         next_pc = pcImm;
         flush = 1'b1;
-    end else if(pc4 == 32'd116) begin 
-        next_pc = 32'd112;
+    end else if(pc4 == 32'h98) begin 
+        next_pc = 32'h94;
         flush = 1'b0;
     end else begin 
         next_pc = pc4;

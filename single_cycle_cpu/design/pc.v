@@ -6,7 +6,7 @@ module pc(
 );
 
 always @(posedge clk) begin
-    if(rst) pc = 32'h34;
+    if(rst) pc <= 32'h5c;
     else pc <= next_pc;
 end
 
